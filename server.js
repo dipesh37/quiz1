@@ -4,21 +4,18 @@ const cors = require("cors");
 require("dotenv").config();
 const path = require("path");
 
-console.log("🚀 Starting NITJ Quiz Application...");
-console.log("📦 Loading dependencies...");
+console.log(" Starting NITJ Quiz Application...");
+console.log(" Loading dependencies...");
 
 const app = express();
 
 console.log("⚙️ Setting up middleware...");
 
-// ✅ Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve static files (Frontend)
 app.use(express.static(path.join(__dirname, "public")));
 
-// ✅ MongoDB Connection with better error handling
 console.log("🔄 Attempting to connect to MongoDB...");
 console.log("📍 MongoDB URI exists:", !!process.env.MONGO_URI);
 
@@ -36,12 +33,12 @@ mongoose
     socketTimeoutMS: 45000,
   })
   .then(() => {
-    console.log("✅ MongoDB connected successfully");
-    console.log("📊 Database name:", mongoose.connection.name);
+    console.log(" MongoDB connected successfully");
+    console.log(" Database name:", mongoose.connection.name);
   })
   .catch((err) => {
-    console.error("❌ MongoDB connection error:", err.message);
-    console.error("❌ Full error:", err);
+    console.error(" MongoDB connection error:", err.message);
+    console.error(" Full error:", err);
     // Don't exit immediately, let the server start and retry connection
     setTimeout(() => {
       console.log("🔄 Retrying MongoDB connection...");
@@ -62,7 +59,7 @@ mongoose.connection.on("disconnected", () => {
   console.log("⚠️ Mongoose disconnected from MongoDB");
 });
 
-// ✅ Mongoose Schema with additional validation
+//  Mongoose Schema with additional validation
 const submissionSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -95,7 +92,6 @@ submissionSchema.index({ submittedAt: -1 });
 
 const Submission = mongoose.model("Submission", submissionSchema);
 
-// ✅ Health check route
 app.get("/", (req, res) => {
   res.json({
     message: "🎉 NITJ Quiz Backend is running!",
@@ -113,7 +109,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// ✅ Submit quiz route with enhanced validation
+// Submit quiz route with validation
 app.post("/submit", async (req, res) => {
   const { email, answer } = req.body;
 
@@ -167,11 +163,11 @@ app.post("/submit", async (req, res) => {
 
     await submission.save();
 
-    console.log(`✅ New submission from: ${email}`);
+    console.log(` New submission from: ${email}`);
 
     res.status(200).json({
       success: true,
-      message: "✅ Submission successful! Thank you for participating.",
+      message: " Submission successful! Thank you for participating.",
       submittedAt: submission.submittedAt,
     });
   } catch (err) {
