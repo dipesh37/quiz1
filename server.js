@@ -115,14 +115,15 @@ app.get("/download-pdf", async (req, res) => {
     submissions.forEach((s, i) => {
       doc
         .fontSize(12)
+
+        .moveDown(0.5)
         .text(`Submission #${i + 1}`, { underline: true })
+        .text(`Submitted: ${new Date(s.submittedAt).toLocaleString()}`)
+        .text(`Email: ${s.email}`)
+        .text(`Answer:`, { continued: true })
         .moveDown(0.5)
-        .text(`📧 Email: ${s.email}`)
-        .text(`🕒 Submitted: ${new Date(s.submittedAt).toLocaleString()}`)
-        .moveDown(0.5)
-        .text(`📝 Answer:`, { continued: true })
-        .text(` ${s.answer}`, { indent: 20 })
         .moveDown(1)
+        .text(` ${s.answer}`, { indent: 20 })
         .text("---------------------------------------------")
         .moveDown(1);
     });
