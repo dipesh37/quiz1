@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const path = require("path");
 
+const PDFDocument = require("pdfkit");
 console.log(" Starting NITJ Quiz Application...");
 console.log(" Loading dependencies...");
 
@@ -92,6 +93,46 @@ submissionSchema.index({ email: 1 });
 submissionSchema.index({ submittedAt: -1 });
 
 const Submission = mongoose.model("Submission", submissionSchema);
+
+// PDF route
+app.get("/download-pdf", async (req, res) => {
+  try {
+    const submissions = await Submission.find().sort({ submittedAt: -1 });
+
+    const doc = new PDFDocument({ margin: 30 });
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="quiz_submissions.pdf"'
+    );
+    res.setHeader("Content-Type", "application/pdf");
+    doc.pipe(res);
+
+    doc
+      .fontSize(18)
+      .text("NITJ Quiz Submissions", { align: "center" })
+      .moveDown();
+
+    submissions.forEach((s, i) => {
+      doc
+        .fontSize(12)
+        .text(`Submission #${i + 1}`, { underline: true })
+        .moveDown(0.5)
+        .text(`📧 Email: ${s.email}`)
+        .text(`🕒 Submitted: ${new Date(s.submittedAt).toLocaleString()}`)
+        .moveDown(0.5)
+        .text(`📝 Answer:`, { continued: true })
+        .text(` ${s.answer}`, { indent: 20 })
+        .moveDown(1)
+        .text("---------------------------------------------")
+        .moveDown(1);
+    });
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Failed to generate PDF.");
+  }
+});
 
 app.get("/", (req, res) => {
   res.json({
