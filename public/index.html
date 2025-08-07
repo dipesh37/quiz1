@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Section | NITJ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-2xl space-y-6 fade-in">
+        <!-- Header -->
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">📝 NITJ Quiz Portal</h1>
+            <p class="text-gray-600">Engineering Excellence Assessment</p>
+        </div>
+
+        <!-- Question Section -->
+        <div class="bg-blue-50 rounded-xl p-6">
+            <p class="text-gray-700 font-medium text-lg leading-relaxed">
+                <span class="font-semibold text-blue-600">Q1:</span> 
+                Explain the importance of sustainable energy in modern engineering. 
+                Discuss how renewable energy sources are transforming the engineering landscape 
+                and their impact on future technological developments.
+            </p>
+        </div>
+
+        <!-- Answer Textarea -->
+        <div>
+            <label for="answer" class="block text-sm font-medium text-gray-700 mb-2">
+                Your Answer <span class="text-red-500">*</span>
+            </label>
+            <textarea
+                id="answer"
+                rows="6"
+                maxlength="2000"
+                class="w-full p-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 resize-none"
+                placeholder="Write your detailed answer here... (minimum 10 characters)"
+            ></textarea>
+            <div class="flex justify-between mt-2">
+                <p class="text-sm text-gray-500">Minimum 10 characters required</p>
+                <p id="charCount" class="text-sm text-gray-500">0/2000</p>
+            </div>
+        </div>
+
+        <!-- Email Input -->
+        <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                NITJ Email Address <span class="text-red-500">*</span>
+            </label>
+            <input
+                type="email"
+                id="email"
+                placeholder="yourname@nitj.ac.in"
+                class="w-full p-4 border-2 border-gray-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200"
+            />
+            <p class="text-sm text-gray-500 mt-1">Must be a valid NITJ email address</p>
+        </div>
+
+        <!-- Timer and Submit Section -->
+        <div class="flex items-center justify-between bg-gray-50 rounded-xl p-4">
+            <div class="flex items-center space-x-2">
+                <span class="text-2xl">⏳</span>
+                <p class="text-gray-700 font-medium">
+                    Time Remaining: 
+                    <span id="countdown" class="font-bold text-red-600 text-xl pulse-animation">300</span>
+                    <span class="text-sm text-gray-600">seconds</span>
+                </p>
+            </div>
+            <button
+                id="submitBtn"
+                onclick="submitQuiz()"
+                class="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-200 transform hover:scale-105 disabled:hover:scale-100 disabled:cursor-not-allowed"
+            >
+                Submit Quiz
+            </button>
+        </div>
+
+        <!-- Status Message -->
+        <div id="statusContainer" class="hidden">
+            <div id="statusMessage" class="p-4 rounded-xl font-medium"></div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-xl">
+            <h3 class="font-semibold text-yellow-800 mb-2">📋 Instructions:</h3>
+            <ul class="text-sm text-yellow-700 space-y-1 list-disc list-inside">
+                <li>Answer must be at least 10 characters long</li>
+                <li>Use only your NITJ email address (@nitj.ac.in)</li>
+                <li>You can only submit once per email</li>
+                <li>Quiz will auto-submit when timer expires</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let timer = 300; // 5 minutes
+        let isSubmitted = false;
+        const countdownEl = document.getElementById("countdown");
+        const statusContainer = document.getElementById("statusContainer");
+        const statusMessage = document.getElementById("statusMessage");
+        const submitBtn = document.getElementById("submitBtn");
+        const answerTextarea = document.getElementById("answer");
+        const emailInput = document.getElementById("email");
+        const charCountEl = document.getElementById("charCount");
+
+        // Character counter
+        answerTextarea.addEventListener('input', function() {
+            const count = this.value.length;
+            charCountEl.textContent = `${count}/2000`;
+            
+            if (count > 1900) {
+                charCountEl.classList.add('text-red-500');
+            } else {
+                charCountEl.classList.remove('text-red-500');
+            }
+        });
+
+        // Timer functionality
+        const interval = setInterval(() => {
+            timer--;
+            countdownEl.textContent = timer;
+            
+            // Change color as time runs out
+            if (timer <= 60) {
+                countdownEl.classList.add('text-red-600', 'pulse-animation');
+            } else if (timer <= 120) {
+                countdownEl.classList.add('text-orange-600');
+                countdownEl.classList.remove('text-red-600');
+            }
+            
+            if (timer <= 0) {
+                clearInterval(interval);
+                if (!isSubmitted) {
+                    showAlert("⏰ Time's up! Auto-submitting your response...", "warning");
+                    setTimeout(() => submitQuiz(), 2000);
+                }
+            }
+        }, 1000);
+
+        // Show status messages
+        function showStatus(message, type) {
+            statusContainer.classList.remove('hidden');
+            statusMessage.textContent = message;
+            
+            // Remove existing classes
+            statusMessage.classList.remove('bg-green-100', 'text-green-800', 'bg-red-100', 'text-red-800', 'bg-yellow-100', 'text-yellow-800');
+            
+            if (type === 'success') {
+                statusMessage.classList.add('bg-green-100', 'text-green-800');
+            } else if (type === 'error') {
+                statusMessage.classList.add('bg-red-100', 'text-red-800');
+            } else if (type === 'warning') {
+                statusMessage.classList.add('bg-yellow-100', 'text-yellow-800');
+            }
+
+            // Auto hide after 5 seconds for non-success messages
+            if (type !== 'success') {
+                setTimeout(() => {
+                    statusContainer.classList.add('hidden');
+                }, 5000);
+            }
+        }
+
+        // Show alerts
+        function showAlert(message, type) {
+            showStatus(message, type);
+        }
+
+        // Validate inputs
+        function validateInputs() {
+            const answer = answerTextarea.value.trim();
+            const email = emailInput.value.trim();
+
+            if (!email) {
+                showAlert("❌ Please enter your email address", "error");
+                emailInput.focus();
+                return false;
+            }
+
+            if (!email.endsWith("@nitj.ac.in")) {
+                showAlert("❌ Please enter a valid NITJ email address", "error");
+                emailInput.focus();
+                return false;
+            }
+
+            if (!answer) {
+                showAlert("❌ Please write your answer", "error");
+                answerTextarea.focus();
+                return false;
+            }
+
+            if (answer.length < 10) {
+                showAlert("❌ Answer must be at least 10 characters long", "error");
+                answerTextarea.focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // Submit quiz function
+        async function submitQuiz() {
+            if (isSubmitted) {
+                showAlert("❌ Quiz already submitted!", "error");
+                return;
+            }
+
+            if (!validateInputs()) {
+                return;
+            }
+
+            const answer = answerTextarea.value.trim();
+            const email = emailInput.value.trim();
+
+            // Disable form
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Submitting...";
+            answerTextarea.disabled = true;
+            emailInput.disabled = true;
+
+            try {
+                const response = await fetch("/submit", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify({ email, answer }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    isSubmitted = true;
+                    clearInterval(interval);
+                    showStatus("✅ " + data.message, "success");
+                    submitBtn.textContent = "Submitted Successfully";
+                    
+                    // Show success animation
+                    document.querySelector('.fade-in').classList.add('bg-green-50');
+                } else {
+                    throw new Error(data.message || "Submission failed");
+                }
+
+            } catch (error) {
+                console.error("Submission error:", error);
+                showAlert("❌ " + (error.message || "Failed to submit. Please try again."), "error");
+                
+                // Re-enable form
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Submit Quiz";
+                answerTextarea.disabled = false;
+                emailInput.disabled = false;
+            }
+        }
+
+        // Prevent form submission on Enter key in textarea
+        answerTextarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                submitQuiz();
+            }
+        });
+
+        // Add Ctrl+Enter shortcut hint
+        document.addEventListener('DOMContentLoaded', function() {
+            const hint = document.createElement('p');
+            hint.className = 'text-xs text-gray-400 mt-1';
+            hint.textContent = 'Tip: Press Ctrl+Enter to quick submit';
+            answerTextarea.parentNode.appendChild(hint);
+        });
+
+        // Warn before page reload/close
+        window.addEventListener('beforeunload', function(e) {
+            if (!isSubmitted && (answerTextarea.value.trim() || emailInput.value.trim())) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+</body>
+</html>
