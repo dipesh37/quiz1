@@ -10,7 +10,7 @@ console.log(" Loading dependencies...");
 
 const app = express();
 
-console.log("⚙️ Setting up middleware...");
+console.log("Setting up middleware...");
 
 app.use(cors());
 
@@ -18,8 +18,8 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "public")));
 
-console.log("🔄 Attempting to connect to MongoDB...");
-console.log("📍 MongoDB URI exists:", !!process.env.MONGO_URI);
+console.log(" Attempting to connect to MongoDB...");
+console.log(" MongoDB URI exists:", !!process.env.MONGO_URI);
 
 if (!process.env.MONGO_URI) {
   console.error("❌ MONGO_URI environment variable is not set!");
@@ -240,7 +240,7 @@ app.post("/submit", async (req, res) => {
   }
 });
 
-// ✅ Get all submissions (admin route - you might want to add authentication)
+//  Get all submissions (admin route - I'll add authentication)
 app.get("/admin/submissions", async (req, res) => {
   try {
     const submissions = await Submission.find({})
@@ -261,7 +261,7 @@ app.get("/admin/submissions", async (req, res) => {
   }
 });
 
-// ✅ Delete submission (admin route)
+//  Delete submission (admin route)
 app.delete("/admin/submissions/:email", async (req, res) => {
   try {
     const { email } = req.params;
@@ -287,12 +287,12 @@ app.delete("/admin/submissions/:email", async (req, res) => {
   }
 });
 
-// ✅ Catch-All for Frontend Routing
+// Catch-All for Frontend Routing
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
-// ✅ Error handling middleware
+//  Error handling middleware
 app.use((err, req, res, next) => {
   console.error("❌ Unhandled error:", err);
   res.status(500).json({
@@ -301,19 +301,19 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Handle unhandled promise rejections
+//  Handle unhandled promise rejections
 process.on("unhandledRejection", (err) => {
   console.error("❌ Unhandled Promise Rejection:", err);
   process.exit(1);
 });
 
-// ✅ Handle uncaught exceptions
+//  Handle uncaught exceptions
 process.on("uncaughtException", (err) => {
   console.error("❌ Uncaught Exception:", err);
   process.exit(1);
 });
 
-// ✅ Start server with port conflict handling
+//  Start server with port conflict handling
 const PORT = process.env.PORT || 5000;
 
 console.log("🚀 Starting server...");
@@ -323,15 +323,15 @@ console.log("🌐 Environment:", process.env.NODE_ENV || "development");
 const server = app
   .listen(PORT, "0.0.0.0", () => {
     console.log(`✅ Server is running successfully!`);
-    console.log(`📱 Port: ${PORT}`);
-    console.log(`🌐 Environment: ${process.env.NODE_ENV || "development"}`);
-    console.log(`🔗 Local URL: http://localhost:${PORT}`);
+    console.log(` Port: ${PORT}`);
+    console.log(` Environment: ${process.env.NODE_ENV || "development"}`);
+    console.log(` Local URL: http://localhost:${PORT}`);
   })
   .on("error", (err) => {
     if (err.code === "EADDRINUSE") {
       console.log(`❌ Port ${PORT} is already in use`);
-      console.log(`💡 Try running: kill -9 $(lsof -ti :${PORT})`);
-      console.log(`💡 Or use a different port: PORT=3001 npm run dev`);
+      console.log(` Try running: kill -9 $(lsof -ti :${PORT})`);
+      console.log(` Or use a different port: PORT=3001 npm run dev`);
       process.exit(1);
     } else {
       console.error("❌ Server error:", err);
@@ -341,7 +341,7 @@ const server = app
 
 // Graceful shutdown
 process.on("SIGTERM", () => {
-  console.log("🛑 SIGTERM received, shutting down gracefully...");
+  console.log("SIGTERM received, shutting down gracefully...");
   server.close(() => {
     console.log("✅ Server closed");
     mongoose.connection.close(false, () => {
