@@ -277,14 +277,6 @@
             }
         });
 
-        // Add Ctrl+Enter shortcut hint
-        document.addEventListener('DOMContentLoaded', function() {
-            const hint = document.createElement('p');
-            hint.className = 'text-xs text-gray-400 mt-1';
-            hint.textContent = 'Tip: Press Ctrl+Enter to quick submit';
-            answerTextarea.parentNode.appendChild(hint);
-        });
-
         // Warn before page reload/close
         window.addEventListener('beforeunload', function(e) {
             if (!isSubmitted && (answerTextarea.value.trim() || emailInput.value.trim())) {
